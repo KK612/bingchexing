@@ -104,9 +104,7 @@ const S=[
 const synth=window.speechSynthesis;let V=null;
 function pickV(){const vs=synth.getVoices();
  V=vs.find(v=>/^zh[-_](hk|yue)/i.test(v.lang))||vs.find(v=>/cantonese|粵|香港/i.test(v.name))||vs.find(v=>/^zh[-_]tw/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null;
- document.getElementById("warn").textContent=V
-  ?(/hk|yue|cantonese|粵/i.test(V.lang+V.name)?"":"ℹ️ 此裝置未有廣東話語音：全首朗讀照用內置錄音；點單字時會用「"+V.name+"」代替讀音。")
-  :"ℹ️ 此裝置未有語音功能：全首朗讀照用內置錄音；點單字讀音暫時無效。";}
+ document.getElementById("warn").textContent="";} // 逐字點讀改用錄音切片，唔再需要 TTS 提示
 synth.onvoiceschanged=pickV;pickV();
 // ── 狀態 ──
 let cur={s:-1,l:0},playing=false,echo=false,slow=false,tok=0,timer=null,timer2=null,kar=null,shown=-1;
@@ -127,7 +125,7 @@ function show(si){
  linesEl.innerHTML=sc.lines.map((ln,li)=>'<div class="line" data-li="'+li+'">'+[...ln].map(c=>'<span class="ch">'+c+'</span>').join("")+"</div>").join("");
  linesEl.querySelectorAll(".line").forEach(el=>{
    el.onclick=()=>{stop();cur.l=+el.dataset.li;playLine();};
-   el.querySelectorAll(".ch").forEach((sp,ci)=>sp.onclick=e=>{e.stopPropagation();stop();sayViaTTS(sp.textContent);hi(el,ci);});
+   el.querySelectorAll(".ch").forEach((sp,ci)=>sp.onclick=e=>{e.stopPropagation();stop();sayChar(+el.dataset.li,ci);hi(el,ci);});
  });
  explain.innerHTML=(sc.y?'<div><b>📖 意思：</b>'+sc.y+'</div>':"")+(sc.k?'<div style="margin-top:6px"><b>💬 同小朋友講：</b>'+sc.k+'</div>':"");
  if([1,2,3,4].includes(si)&&window.__upgrade3D)window.__upgrade3D();
@@ -147,6 +145,14 @@ function playSeg(a,done){const t=++tok;AU.pause();clearTimeout(timer);
 function sayViaTTS(txt,done){const t=++tok;synth.cancel();
  const u=new SpeechSynthesisUtterance(txt);if(V)u.voice=V,u.lang=V.lang;else u.lang="zh-HK";
  u.rate=slow?0.5:0.85;const fin=()=>{if(t===tok&&done)done();};u.onend=fin;u.onerror=fin;synth.speak(u);}
+// 逐字點讀：直接播錄音入面該字嘅一小段（KT 起音 → 下一字起音），唔靠 TTS，iOS 都一定有聲
+function sayChar(li,ci){const f=fIdx()-cur.l+li,arr=KT[f];
+ if(!arr||ci>=arr.length)return;
+ const s=Math.max(0,arr[ci]-0.04),e=ci+1<arr.length?arr[ci+1]:TL[f+1][1];
+ playSeg([s,e]);
+ clearTimeout(timer2);
+ timer2=setTimeout(()=>{const el=linesEl.children[li];
+  if(el)el.querySelectorAll(".ch").forEach(x=>x.classList.remove("on"));},(e-s)*1000/(slow?0.5:1)+150);}
 function playLine(){
  linesEl.querySelectorAll(".line").forEach((el,i)=>el.classList.toggle("on",i===cur.l));
  const a=TL[fIdx()+1];
