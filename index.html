@@ -105,8 +105,8 @@ const synth=window.speechSynthesis;let V=null;
 function pickV(){const vs=synth.getVoices();
  V=vs.find(v=>/^zh[-_](hk|yue)/i.test(v.lang))||vs.find(v=>/cantonese|粵|香港/i.test(v.name))||vs.find(v=>/^zh[-_]tw/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null;
  document.getElementById("warn").textContent=V
-  ?(/hk|yue|cantonese|粵/i.test(V.lang+V.name)?"":"⚠️ 未找到廣東話語音：整首朗讀用內置錄音，不受影響；只有「點單字讀音」會用代替語音（"+V.name+"）。")
-  :"⚠️ 此瀏覽器沒有語音功能：整首朗讀用內置錄音，不受影響；只有「點單字讀音」無效。";}
+  ?(/hk|yue|cantonese|粵/i.test(V.lang+V.name)?"":"ℹ️ 此裝置未有廣東話語音：全首朗讀照用內置錄音；點單字時會用「"+V.name+"」代替讀音。")
+  :"ℹ️ 此裝置未有語音功能：全首朗讀照用內置錄音；點單字讀音暫時無效。";}
 synth.onvoiceschanged=pickV;pickV();
 // ── 狀態 ──
 let cur={s:-1,l:0},playing=false,echo=false,slow=false,tok=0,timer=null,timer2=null,kar=null,shown=-1;
