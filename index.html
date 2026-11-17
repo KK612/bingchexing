@@ -155,13 +155,13 @@ function show(si){
    el.querySelectorAll(".ch").forEach((sp,ci)=>sp.onclick=e=>{e.stopPropagation();stop();sayChar(+el.dataset.li,ci);hi(el,ci);});
  });
  explain.innerHTML=(sc.y?'<div><b>📖 意思：</b>'+sc.y+'</div>':"")+(sc.k?'<div style="margin-top:6px"><b>💬 同小朋友講：</b>'+sc.k+'</div>':"");
- if([1,2,3,4,5,6].includes(si)&&window.__upgrade3D)window.__upgrade3D();
+ if([1,2,3,4,5,6,7].includes(si)&&window.__upgrade3D)window.__upgrade3D();
 }
 function hi(el,ci){el.querySelectorAll(".ch").forEach((s,i)=>s.classList.toggle("on",i===ci));}
 // ── 朗讀：全詩用「易真說」真人錄音（YouTube watch?v=9xXTljcJLIU）；單字點讀用瀏覽器語音 ──
 // TL[0]=片頭（標題＋作者），TL[1..35]=35 句詩之 [開始,結束] 秒；由 whisper 對齊＋靜音偵測得出
 const TL=[[0.0,4.23],[4.46,6.15],[6.28,8.21],[8.44,12.57],[12.8,16.85],[17.08,21.37],[21.6,25.57],[25.8,29.43],[29.43,34.27],[34.5,38.97],[39.2,43.43],[43.66,48.19],[48.42,52.61],[52.84,57.17],[57.4,61.95],[62.18,67.85],[68.08,72.39],[72.62,76.81],[77.04,81.35],[81.58,86.71],[86.94,90.49],[90.72,93.93],[94.16,99.71],[99.94,102.33],[102.56,106.01],[106.24,110.91],[111.14,114.49],[114.72,116.77],[117.0,120.25],[120.48,123.29],[123.29,128.25],[128.48,133.15],[133.38,136.49],[136.72,140.75],[140.98,145.15],[145.38,150.71]];
-const KT=[[4.58,5.2,5.6],[6.4,6.9,7.32],[8.56,8.74,9.1,9.48,9.92,10.76,11.38],[12.92,13.14,13.44,13.82,14.36,15.26,15.84],[17.2,17.54,17.8,18.16,18.68,19.58,20.08],[21.72,22.04,22.36,22.7,23.12,23.9,24.46],[25.92,26.08,26.4,26.74,27.28,28.26,28.88],[29.32,30.7,31.12,31.44,31.98,32.88,33.42],[34.62,35.28,35.58,35.88,36.46,37.26,37.88],[39.32,39.6,39.92,40.24,40.78,41.68,42.42],[43.78,44.12,44.44,44.8,45.46,46.18,46.86],[48.54,48.74,49.08,49.42,50.08,50.74,51.4],[52.96,53.18,53.46,53.86,54.92,55.46,56.2],[57.52,57.78,58.12,58.48,59.58,59.8,60.44],[62.3,62.4,62.5,62.88,63.08,63.28,63.48],[68.2,68.27,68.34,68.4,68.78,69.16,69.6,70.64,70.84,71.04],[72.74,73.0,73.34,73.72,73.92,74.12,74.32],[77.16,77.36,77.99,78.62,79.26,79.46,79.66],[81.7,81.9,82.54,83.18,83.82,84.02,84.22],[87.06,87.13,87.19,87.26,87.93,88.61,89.28],[90.84,91.09,91.34,92.12,92.9,93.1,93.3],[94.28,95.66,96.39,97.12,97.32],[100.06,100.16,100.26,100.46,100.66],[102.68,103.02,103.54,104.07,104.6],[106.36,106.72,106.92,107.12,107.32],[111.26,111.36,111.46,111.66,111.86],[114.84,114.94,115.04,115.06,115.66],[117.12,117.38,118.42,118.66,119.26],[120.6,120.82,121.9,122.16,122.74],[123.26,124.58,124.91,125.24,125.44,125.64,125.84],[128.6,128.78,129.1,129.56,129.76,129.96,130.16],[133.5,133.6,133.7,134.74,134.96,135.54],[136.84,137.1,137.42,137.72,138.82,139.04,139.58],[141.1,141.32,141.62,142.12,143.22,143.52,144.02],[145.5,145.76,146.13,146.5,146.7,146.9,147.1]]; // 每句逐字起音時間（whisper small 對齊，嚴格遞增；weak 句內插）
+const KT=[[4.58,5.2,5.6],[6.4,6.9,7.32],[8.56,8.74,9.1,9.48,9.92,10.76,11.38],[12.92,13.14,13.44,13.82,14.36,15.26,15.84],[17.2,17.54,17.8,18.16,18.68,19.58,20.08],[21.72,22.04,22.36,22.7,23.12,23.9,24.46],[25.92,26.08,26.4,26.74,27.28,28.26,28.88],[29.32,30.7,31.12,31.44,31.98,32.88,33.42],[34.62,35.28,35.58,35.88,36.46,37.26,37.88],[39.32,39.6,39.92,40.24,40.78,41.68,42.42],[43.78,44.12,44.44,44.8,45.46,46.18,46.86],[48.54,48.74,49.08,49.42,50.08,50.74,51.4],[52.96,53.18,53.46,53.86,54.92,55.46,56.2],[57.52,57.78,58.12,58.48,59.58,59.8,60.44],[62.25,62.66,63.04,63.96,65.21,66.7,67.1],[68.57,69.0,69.4,69.74,70.54,71.11,71.52,71.72,71.9,72.05],[72.74,73.0,73.34,73.72,73.92,74.12,74.32],[77.16,77.36,77.99,78.62,79.26,79.46,79.66],[81.7,81.9,82.54,83.18,83.82,84.02,84.22],[87.06,87.13,87.19,87.26,87.93,88.61,89.28],[90.84,91.09,91.34,92.12,92.9,93.1,93.3],[94.28,95.66,96.39,97.12,97.32],[100.06,100.16,100.26,100.46,100.66],[102.68,103.02,103.54,104.07,104.6],[106.36,106.72,106.92,107.12,107.32],[111.26,111.36,111.46,111.66,111.86],[114.84,114.94,115.04,115.06,115.66],[117.12,117.38,118.42,118.66,119.26],[120.6,120.82,121.9,122.16,122.74],[123.26,124.58,124.91,125.24,125.44,125.64,125.84],[128.6,128.78,129.1,129.56,129.76,129.96,130.16],[133.5,133.6,133.7,134.74,134.96,135.54],[136.84,137.1,137.42,137.72,138.82,139.04,139.58],[141.1,141.32,141.62,142.12,143.22,143.52,144.02],[145.5,145.76,146.13,146.5,146.7,146.9,147.1]]; // 每句逐字起音時間（whisper small 對齊，嚴格遞增；weak 句內插）
 const AUD="audio.mp3",AU=new Audio(AUD);AU.preservesPitch=true;
 let audioStarted=false; // 一撳過播放就唔再換 AU.src，否則 load() 會 reset 播緊嘅音
 // 錄音已獨立成 audio.mp3；開頁即刻轉 blob URL，iOS 播放更穩（失敗就照用原檔；播緊就唔換，免 reset）
@@ -243,7 +243,7 @@ window.__dispose3D=null;
 window.__upgrade3D=async()=>{
  if(window.__dispose3D)return;          // 已在 3D 中，不重建
  const si=window.cur3d.s;
- if(si!==1&&si!==2&&si!==3&&si!==4&&si!==5&&si!==6)return;
+ if(si!==1&&si!==2&&si!==3&&si!==4&&si!==5&&si!==6&&si!==7)return;
  let T;try{T=await import("https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js");}catch(e){return;}
  if(window.cur3d.s!==si)return;
  const st=window.stageEl,W=st.clientWidth,H=st.clientHeight;
@@ -500,6 +500,57 @@ window.__upgrade3D=async()=>{
    cam.position.set(x*0.3+Math.sin(t*0.3)*0.4,2.2,8.4);
    cam.lookAt(x*0.3,1.0,-3);
   };
+ }else if(si===7){
+  // 血流成海：邊庭血流成海；武皇開邊意未已，皇帝仲想繼續擴張
+  // 第一句：紅色血海湧起；第二句：武皇企起身，指住邊關想繼續開邊
+  // 血海（前面）：紅色平面＋海浪
+  const sea=new T.Mesh(new T.PlaneGeometry(30,4),new T.MeshLambertMaterial({color:0xa93226}));
+  sea.rotation.x=-Math.PI/2;sea.position.set(0,0.02,3);sc.add(sea);
+  const waves=[];
+  for(let i=0;i<4;i++){const w=spr("🌊",1.2);w.position.set(-9+i*6,0.5,2.5);sc.add(w);waves.push(w);}
+  // 邊關（左邊）：旗＋矮牆
+  const pole=new T.Mesh(new T.BoxGeometry(0.12,2.6,0.12),new T.MeshLambertMaterial({color:0x5a3a1e}));
+  pole.position.set(-8,1.3,-6);sc.add(pole);
+  const flag=spr("🚩",1.2);flag.position.set(-8,2.9,-6);sc.add(flag);
+  const wall=new T.Mesh(new T.BoxGeometry(4,1,0.6),new T.MeshLambertMaterial({color:0x9a9a9a}));
+  wall.position.set(-8,0.5,-5.5);sc.add(wall);
+  // 武皇寶座（右邊）：金色平台＋皇冠
+  const throne=new T.Mesh(new T.BoxGeometry(2.5,1,2.5),new T.MeshLambertMaterial({color:0xC9A227}));
+  throne.position.set(8,0.5,-6);sc.add(throne);
+  const crown=spr("👑",1.6);crown.position.set(8,1.6,-6);sc.add(crown);
+  // 擴張箭嘴（第二句先出現，指去邊關）
+  const arrow=spr("⬅️",1.3);arrow.position.set(0,2.2,-2);arrow.scale.set(0.01,0.01,1);arrow.material.opacity=0;sc.add(arrow);
+  // 牌（白字深邊）：血流成海／武皇
+  function tag(txt){const cv=document.createElement("canvas");cv.width=256;cv.height=80;
+   const g=cv.getContext("2d");g.font="bold 46px sans-serif";g.textAlign="center";g.textBaseline="middle";
+   g.lineWidth=8;g.strokeStyle="rgba(60,40,10,0.9)";g.strokeText(txt,128,42);g.fillStyle="#fff";g.fillText(txt,128,42);
+   const sp=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(cv),transparent:true}));
+   sp.scale.set(2.8,0.9,1);return sp;}
+  const tagSea=tag("血流成海");tagSea.position.set(-6,3.4,-4);sc.add(tagSea);
+  const tagKing=tag("武皇");tagKing.position.set(8,3.8,-6);sc.add(tagKing);
+  let etBase=null,tBase=0; // 音訊停低嗰陣記住行到邊，等佢由嗰度繼續行，唔會跳去終點
+  update=(dt,t)=>{
+   // 兩句分兩段：第一句「邊庭流血成海水」（約 4.55 秒）血海湧起；第二句「武皇開邊意未已」（約 5.90 秒）武皇企起身指去邊關
+   const T1=4.55,T2=5.9; // TL[14]=[57.4,61.95]、TL[15]=[62.18,67.85]，成幕約 10.45 秒
+   // 跟音訊時鐘：播緊第 7 幕嗰陣，動畫跟把聲行（慢速／重讀都同步）；停咗就由停低嗰個位繼續，唔會跳
+   let et=t;
+   try{
+    if(typeof AU!=="undefined"&&!AU.paused&&AU.currentTime>=57.4&&AU.currentTime<=67.85){et=AU.currentTime-57.4;etBase=et;tBase=t;}
+    else if(etBase!==null){et=Math.min(T1+T2,etBase+(t-tBase));}
+   }catch(e){}
+   const p1=Math.min(1,et/T1); // 血海湧起進度
+   const p2=Math.min(1,Math.max(0,(et-T1)/5.05)); // 武皇企起身進度（提早約 0.85 秒完成，轉幕前企定）
+   sea.scale.set(0.3+0.7*p1,1,1);sea.position.y=0.02+0.1*p1;
+   waves.forEach((w,i)=>{w.position.y=0.5+Math.sin(t*2+i*1.3)*0.15;const s=0.6+0.6*p1;w.scale.set(s,s,1);});
+   crown.position.y=1.6+0.7*p2; // 武皇企起身
+   const cs=1+0.25*p2;crown.scale.set(cs,cs,1);
+   const ao=p2<0.3?0:Math.min(1,(p2-0.3)/0.4); // 箭嘴第二句中段先出現
+   arrow.scale.set(1.3*ao,1.3*ao,1);arrow.material.opacity=ao;
+   arrow.position.y=2.2+Math.sin(t*2.5)*0.15;
+   tagSea.position.y=3.4+Math.sin(t*1.5)*0.08;tagKing.position.y=3.8+Math.sin(t*1.5+1)*0.08;
+   cam.position.set(Math.sin(t*0.3)*0.4+p2*1.0,2.2,8.4);
+   cam.lookAt(p2*1.0,1.0,-3);
+  };
  }else{
   // 道旁過者問行人：老翁攔住帶弓箭嘅士兵發問，士兵搖頭嘆氣作答
   const sol=new T.Group();sol.add(spr("🧍",1.1));
@@ -550,7 +601,7 @@ window.__upgrade3D=async()=>{
   r.dispose();r.domElement.remove();
  };
 };
-if([1,2,3,4,5,6].includes(window.cur3d.s))window.__upgrade3D();
+if([1,2,3,4,5,6,7].includes(window.cur3d.s))window.__upgrade3D();
 </script>
 </body>
 </html>
