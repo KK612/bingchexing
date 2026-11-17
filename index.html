@@ -509,17 +509,17 @@ window.__upgrade3D=async()=>{
   const sea=new T.Mesh(new T.PlaneGeometry(30,4),new T.MeshLambertMaterial({color:0xa93226}));
   sea.rotation.x=-Math.PI/2;sea.position.set(0,0.02,3);sc.add(sea);
   const waves=[];
-  for(let i=0;i<4;i++){const w=spr("🌊",1.2);w.position.set(-9+i*6,0.5,2.5);sc.add(w);waves.push(w);}
+  for(let i=0;i<4;i++){const w=spr("🌊",1.2);w.position.set(-7.5+i*5,0.5,2.5);sc.add(w);waves.push(w);}
   // 邊關（左邊）：旗＋矮牆
   const pole=new T.Mesh(new T.BoxGeometry(0.12,2.6,0.12),new T.MeshLambertMaterial({color:0x5a3a1e}));
-  pole.position.set(-8,1.3,-6);sc.add(pole);
-  const flag=spr("🚩",1.2);flag.position.set(-8,2.9,-6);sc.add(flag);
+  pole.position.set(-6,1.3,-6);sc.add(pole);
+  const flag=spr("🚩",1.2);flag.position.set(-6,2.9,-6);sc.add(flag);
   const wall=new T.Mesh(new T.BoxGeometry(4,1,0.6),new T.MeshLambertMaterial({color:0x9a9a9a}));
-  wall.position.set(-8,0.5,-5.5);sc.add(wall);
+  wall.position.set(-6,0.5,-5.5);sc.add(wall);
   // 武皇寶座（右邊）：金色平台＋皇冠（放 z=-3，避開後方山丘，唔好畀山遮住）
   const throne=new T.Mesh(new T.BoxGeometry(2.5,1,2.5),new T.MeshLambertMaterial({color:0xC9A227}));
-  throne.position.set(8,0.5,-3);sc.add(throne);
-  const crown=spr("👑",1.6);crown.position.set(8,1.6,-3);sc.add(crown);
+  throne.position.set(6,0.5,-3);sc.add(throne);
+  const crown=spr("👑",1.6);crown.position.set(6,1.6,-3);sc.add(crown);
   // 擴張箭嘴（第二句先出現，指去邊關）
   const arrow=spr("⬅️",1.3);arrow.position.set(0,2.2,-2);arrow.scale.set(0.01,0.01,1);arrow.material.opacity=0;sc.add(arrow);
   // 牌（白字深邊）：血流成海／武皇
@@ -528,8 +528,8 @@ window.__upgrade3D=async()=>{
    g.lineWidth=8;g.strokeStyle="rgba(60,40,10,0.9)";g.strokeText(txt,128,42);g.fillStyle="#fff";g.fillText(txt,128,42);
    const sp=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(cv),transparent:true}));
    sp.scale.set(2.8,0.9,1);return sp;}
-  const tagSea=tag("血流成海");tagSea.position.set(-6,3.4,-4);sc.add(tagSea);
-  const tagKing=tag("武皇");tagKing.position.set(8,3.8,-3);sc.add(tagKing);
+  const tagSea=tag("血流成海");tagSea.position.set(-5.5,3.4,-4);sc.add(tagSea);
+  const tagKing=tag("武皇");tagKing.position.set(6,3.8,-3);sc.add(tagKing);
   let etBase=null,tBase=0; // 音訊停低嗰陣記住行到邊，等佢由嗰度繼續行，唔會跳去終點
   update=(dt,t)=>{
    // 兩句分兩段：第一句「邊庭流血成海水」（約 4.55 秒）血海湧起；第二句「武皇開邊意未已」（約 5.90 秒）武皇企起身指去邊關
@@ -550,7 +550,9 @@ window.__upgrade3D=async()=>{
    arrow.scale.set(1.3*ao,1.3*ao,1);arrow.material.opacity=ao;
    arrow.position.y=2.2+Math.sin(t*2.5)*0.15;
    tagSea.position.y=3.4+Math.sin(t*1.5)*0.08;tagKing.position.y=3.8+Math.sin(t*1.5+1)*0.08;
-   cam.position.set(Math.sin(t*0.3)*0.4+p2*1.0,2.2,8.4);
+   // 窄屏（電話直向）要拉遠鏡頭先睇得晒左右，唔好切走武皇／邊關；闊屏維持原距離
+   const asp=cam.aspect||1.7,cz=Math.max(8.4,8.5/(0.4142*asp)-3);
+   cam.position.set(Math.sin(t*0.3)*0.4+p2*1.0,2.2,cz);
    cam.lookAt(p2*1.0,1.0,-3);
   };
  }else{
