@@ -196,16 +196,20 @@ function sayChar(li,ci){const f=fIdx()-cur.l+li,arr=KT[f];
 function playLine(){
  linesEl.querySelectorAll(".line").forEach((el,i)=>el.classList.toggle("on",i===cur.l));
  const a=TL[fIdx()+1];
- clearInterval(kar);
- playSeg(a,()=>{clearInterval(kar);kar=null;if(playing)next();});
- // 逐字紅色跟讀：用 whisper 對齊的每字起音時間（KT），以音訊時鐘對位（任何倍速都同步）
- kar=setInterval(()=>{
+ cancelAnimationFrame(kar);
+ playSeg(a,()=>{cancelAnimationFrame(kar);kar=null;if(playing)next();});
+ // 逐字紅色跟讀＋段落尾守衛：用 rAF 每幀對位（約 16ms），比 setInterval（80ms）更準，唔怕瀏覽器 throttle timer；timeupdate 嗰重守衛照留低做後備
+ const loop=()=>{
+  if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();
   const arr=KT[fIdx()],t=AU.currentTime;
-  if(t<arr[0])return;
-  let idx=arr.length-1;while(idx>0&&t<arr[idx])idx--;
-  const el=linesEl.querySelector(".line.on");
-  if(el)hi(el,idx);
- },80);
+  if(t>=arr[0]){
+   let idx=arr.length-1;while(idx>0&&t<arr[idx])idx--;
+   const el=linesEl.querySelector(".line.on");
+   if(el)hi(el,idx);
+  }
+  kar=requestAnimationFrame(loop);
+ };
+ kar=requestAnimationFrame(loop);
 }
 function next(){clearTimeout(timer2);
  if(echo){hint.textContent="🎤 輪到你讀啦！";timer2=setTimeout(()=>{hint.textContent="";advance();},4000);}
@@ -233,7 +237,7 @@ $("stop").onclick=stop;
 $("again").onclick=()=>{stop();playLine();};
 $("slow").onclick=e=>{slow=!slow;AU.playbackRate=slow?0.5:1;e.currentTarget.classList.toggle("on",slow);};
 $("tch").onclick=e=>{explain.classList.toggle("show");e.currentTarget.classList.toggle("on",explain.classList.contains("show"));};
-function stop(){playing=false;tok++;segEnd=0;AU.pause();synth.cancel();clearTimeout(timer);clearTimeout(timer2);clearInterval(kar);kar=null;hint.textContent="";}
+function stop(){playing=false;tok++;segEnd=0;AU.pause();synth.cancel();clearTimeout(timer);clearTimeout(timer2);cancelAnimationFrame(kar);kar=null;hint.textContent="";}
 // ── 家長手冊 ──
 $("manual").innerHTML="<tr><th>詩句</th><th>意思</th><th>同小朋友講</th></tr>"+
  S.filter(s=>s.lines.length).map(s=>"<tr><td>"+s.lines.join("<br>")+"</td><td>"+s.y+"</td><td>"+s.k+"</td></tr>").join("");
