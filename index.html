@@ -166,7 +166,20 @@ const KT=[[4.58,5.2,5.6],[6.4,6.9,7.32],[8.56,8.74,9.1,9.48,9.92,10.76,11.38],[1
 const AUD="audio.mp3",AU=new Audio(AUD);AU.preservesPitch=true;
 let audioStarted=false; // 一撳過播放就唔再換 AU.src，否則 load() 會 reset 播緊嘅音
 let segEnd=0; // 段落尾秒數；timeupdate 守住，唔好播過尾帶埋下一句（setTimeout 喺手機可以遲到）
-AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();});
+AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();if(kar)karTick();});
+let karWatch=null; // 250ms watchdog：rAF／timeupdate 喺手機被 throttle 嗰陣頂上，唔好等 highlight 慢幾秒、音頻播過尾
+// 逐字 highlight＋段尾守衛（共用）：rAF 順暢時每幀跑；rAF／timer 喺手機被 throttle 嗰陣，timeupdate（約 4 次／秒）＋ watchdog 頂上
+function karTick(){
+ if(!segEnd)return;
+ if(!AU.paused&&AU.currentTime>=segEnd){AU.pause();return;}
+ const arr=KT[fIdx()],t=AU.currentTime;
+ if(t>=arr[0]){
+  let idx=arr.length-1;while(idx>0&&t<arr[idx])idx--;
+  const el=linesEl.querySelector(".line.on");
+  if(el)hi(el,idx);
+ }
+ dbgUpdate();
+}
 // 錄音已獨立成 audio.mp3；開頁即刻轉 blob URL，iOS 播放更穩（失敗就照用原檔；播緊就唔換，免 reset）
 fetch(AUD).then(r=>r.blob()).then(b=>{if(audioStarted)return;const u=URL.createObjectURL(b);AU.src=u;AU.load();}).catch(()=>{});
 // ── debug 面板（?debug=1 先顯示；畀用戶截圖，睇吓部機上面實際發生緊咩）──
@@ -174,7 +187,7 @@ const DBG=new URLSearchParams(location.search).has("debug"),dbgEl=document.getEl
 function dbgUpdate(){
  if(!DBG||!dbgEl)return;
  const arr=KT[14];
- dbgEl.textContent="VER=kt3 | KT[14]="+JSON.stringify(arr)+" | TL[15]="+JSON.stringify(TL[15])+"\n"
+ dbgEl.textContent="VER=kt4 | KT[14]="+JSON.stringify(arr)+" | TL[15]="+JSON.stringify(TL[15])+"\n"
   +"AU.src="+(AU.src.startsWith("blob:")?"blob":"direct")+" | readyState="+AU.readyState+" | duration="+(isFinite(AU.duration)?AU.duration.toFixed(2):AU.duration)+"\n"
   +"t="+AU.currentTime.toFixed(2)+" | segEnd="+segEnd+" | paused="+AU.paused+" | rate="+AU.playbackRate+" | scene="+cur.s+" line="+cur.l+" fIdx="+fIdx();
 }
@@ -209,20 +222,12 @@ function playLine(){
  const a=TL[fIdx()+1];
  cancelAnimationFrame(kar);
  // 播成句嗰陣，提早 0.5 秒開聲（播句前嗰段靜音）：等瀏覽器 seek＋出聲嗰陣延遲食咗，唔好食埋第一隻字「武」嘅頭半截；highlight 照用 KT＋currentTime 對位，唔受影響；段尾（segEnd／timer）照樣喺 a[1] 停
- playSeg([Math.max(0,a[0]-0.5),a[1]],()=>{cancelAnimationFrame(kar);kar=null;if(playing)next();});
- // 逐字紅色跟讀＋段落尾守衛：用 rAF 每幀對位（約 16ms），比 setInterval（80ms）更準，唔怕瀏覽器 throttle timer；timeupdate 嗰重守衛照留低做後備
- const loop=()=>{
-  if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();
-  const arr=KT[fIdx()],t=AU.currentTime;
-  if(t>=arr[0]){
-   let idx=arr.length-1;while(idx>0&&t<arr[idx])idx--;
-   const el=linesEl.querySelector(".line.on");
-   if(el)hi(el,idx);
-  }
-  dbgUpdate();
-  kar=requestAnimationFrame(loop);
- };
+ playSeg([Math.max(0,a[0]-0.5),a[1]],()=>{cancelAnimationFrame(kar);kar=null;clearInterval(karWatch);karWatch=null;if(playing)next();});
+ // 逐字紅色跟讀＋段落尾守衛：rAF 每幀對位（約 16ms）最順；手機瀏覽器 throttle rAF／timer 嗰陣，timeupdate＋250ms watchdog 頂上，highlight 唔會慢幾秒、音頻唔會播過尾
+ const loop=()=>{karTick();kar=requestAnimationFrame(loop);};
  kar=requestAnimationFrame(loop);
+ clearInterval(karWatch);
+ karWatch=setInterval(()=>{if(kar)karTick();},250);
 }
 function next(){clearTimeout(timer2);
  if(echo){hint.textContent="🎤 輪到你讀啦！";timer2=setTimeout(()=>{hint.textContent="";advance();},4000);}
@@ -250,7 +255,7 @@ $("stop").onclick=stop;
 $("again").onclick=()=>{stop();playLine();};
 $("slow").onclick=e=>{slow=!slow;AU.playbackRate=slow?0.5:1;e.currentTarget.classList.toggle("on",slow);};
 $("tch").onclick=e=>{explain.classList.toggle("show");e.currentTarget.classList.toggle("on",explain.classList.contains("show"));};
-function stop(){playing=false;tok++;segEnd=0;AU.pause();synth.cancel();clearTimeout(timer);clearTimeout(timer2);cancelAnimationFrame(kar);kar=null;hint.textContent="";}
+function stop(){playing=false;tok++;segEnd=0;AU.pause();synth.cancel();clearTimeout(timer);clearTimeout(timer2);cancelAnimationFrame(kar);kar=null;clearInterval(karWatch);karWatch=null;hint.textContent="";}
 // ── 家長手冊 ──
 $("manual").innerHTML="<tr><th>詩句</th><th>意思</th><th>同小朋友講</th></tr>"+
  S.filter(s=>s.lines.length).map(s=>"<tr><td>"+s.lines.join("<br>")+"</td><td>"+s.y+"</td><td>"+s.k+"</td></tr>").join("");
