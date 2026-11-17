@@ -166,13 +166,15 @@ const KT=[[4.58,5.2,5.6],[6.4,6.9,7.32],[8.56,8.74,9.1,9.48,9.92,10.76,11.38],[1
 const AUD="audio.mp3",AU=new Audio(AUD);AU.preservesPitch=true;
 let audioStarted=false; // 一撳過播放就唔再換 AU.src，否則 load() 會 reset 播緊嘅音
 let segEnd=0; // 段落尾秒數；timeupdate 守住，唔好播過尾帶埋下一句（setTimeout 喺手機可以遲到）
-AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();if(kar)karTick();});
+let segWall0=0,segPos0=0,segRate=1; // wall-clock 錨點：手機 currentTime 會滯後（實測慢 1–2 秒），改用 performance.now() 計播放位置，唔靠 currentTime
+function nowPos(){return segPos0+(performance.now()-segWall0)/1000*segRate;}
+AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&(AU.currentTime>=segEnd||nowPos()>=segEnd))AU.pause();if(kar)karTick();});
 let karWatch=null; // 250ms watchdog：rAF／timeupdate 喺手機被 throttle 嗰陣頂上，唔好等 highlight 慢幾秒、音頻播過尾
 // 逐字 highlight＋段尾守衛（共用）：rAF 順暢時每幀跑；rAF／timer 喺手機被 throttle 嗰陣，timeupdate（約 4 次／秒）＋ watchdog 頂上
 function karTick(){
  if(!segEnd)return;
- if(!AU.paused&&AU.currentTime>=segEnd){AU.pause();return;}
- const arr=KT[fIdx()],t=AU.currentTime;
+ if(!AU.paused&&(AU.currentTime>=segEnd||nowPos()>=segEnd)){AU.pause();return;}
+ const arr=KT[fIdx()],t=nowPos();
  if(t>=arr[0]){
   let idx=arr.length-1;while(idx>0&&t<arr[idx])idx--;
   const el=linesEl.querySelector(".line.on");
@@ -187,9 +189,9 @@ const DBG=new URLSearchParams(location.search).has("debug"),dbgEl=document.getEl
 function dbgUpdate(){
  if(!DBG||!dbgEl)return;
  const arr=KT[14];
- dbgEl.textContent="VER=kt4 | KT[14]="+JSON.stringify(arr)+" | TL[15]="+JSON.stringify(TL[15])+"\n"
+ dbgEl.textContent="VER=kt5 | KT[14]="+JSON.stringify(arr)+" | TL[15]="+JSON.stringify(TL[15])+"\n"
   +"AU.src="+(AU.src.startsWith("blob:")?"blob":"direct")+" | readyState="+AU.readyState+" | duration="+(isFinite(AU.duration)?AU.duration.toFixed(2):AU.duration)+"\n"
-  +"t="+AU.currentTime.toFixed(2)+" | segEnd="+segEnd+" | paused="+AU.paused+" | rate="+AU.playbackRate+" | scene="+cur.s+" line="+cur.l+" fIdx="+fIdx();
+  +"t="+AU.currentTime.toFixed(2)+" | w="+nowPos().toFixed(2)+" | segEnd="+segEnd+" | paused="+AU.paused+" | rate="+AU.playbackRate+" | scene="+cur.s+" line="+cur.l+" fIdx="+fIdx();
 }
 if(DBG&&dbgEl){dbgEl.style.display="block";dbgUpdate();setInterval(dbgUpdate,200);}
 function fIdx(){let f=0;for(let i=0;i<cur.s;i++)f+=S[i].lines.length;return f+cur.l;}
@@ -197,7 +199,7 @@ function playSeg(a,done){const t=++tok;segEnd=a[1];AU.pause();clearTimeout(timer
  const r=slow?0.5:1;
  // 段落計時要由真正開始播嗰刻先計，唔係由撳掣嗰刻計，否則載入慢咗就會行快過把聲
  const startTimer=()=>{timer=setTimeout(()=>{AU.pause();segEnd=0;if(t===tok&&done)done();},(a[1]-a[0])*1000/r);};
- const go=()=>{audioStarted=true;try{AU.currentTime=a[0];}catch(e){}AU.playbackRate=r;const p=AU.play();if(p&&p.catch)p.catch(()=>{});startTimer();};
+ const go=()=>{audioStarted=true;try{AU.currentTime=a[0];}catch(e){}AU.playbackRate=r;segWall0=performance.now();segPos0=a[0];segRate=r;const p=AU.play();if(p&&p.catch)p.catch(()=>{});startTimer();};
  // iOS 要求 play() 喺手勢內同步呼叫：未載入完都先 play，載入後再跳去正確位置
  if(AU.readyState>=1)go();
  else{const md=()=>{AU.removeEventListener("loadedmetadata",md);AU.removeEventListener("error",er);if(t===tok)go();};
