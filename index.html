@@ -164,13 +164,15 @@ const TL=[[0.0,4.23],[4.46,6.15],[6.28,8.21],[8.44,12.57],[12.8,16.85],[17.08,21
 const KT=[[4.58,5.2,5.6],[6.4,6.9,7.32],[8.56,8.74,9.1,9.48,9.92,10.76,11.38],[12.92,13.14,13.44,13.82,14.36,15.26,15.84],[17.2,17.54,17.8,18.16,18.68,19.58,20.08],[21.72,22.04,22.36,22.7,23.12,23.9,24.46],[25.92,26.08,26.4,26.74,27.28,28.26,28.88],[29.32,30.7,31.12,31.44,31.98,32.88,33.42],[34.62,35.28,35.58,35.88,36.46,37.26,37.88],[39.32,39.6,39.92,40.24,40.78,41.68,42.42],[43.78,44.12,44.44,44.8,45.46,46.18,46.86],[48.54,48.74,49.08,49.42,50.08,50.74,51.4],[52.96,53.18,53.46,53.86,54.92,55.46,56.2],[57.52,57.78,58.12,58.48,59.58,59.8,60.44],[62.25,62.66,63.04,63.96,65.21,66.7,67.1],[68.57,69.0,69.4,69.74,70.54,71.11,71.52,71.72,71.9,72.05],[72.74,73.0,73.34,73.72,73.92,74.12,74.32],[77.16,77.36,77.99,78.62,79.26,79.46,79.66],[81.7,81.9,82.54,83.18,83.82,84.02,84.22],[87.06,87.13,87.19,87.26,87.93,88.61,89.28],[90.84,91.09,91.34,92.12,92.9,93.1,93.3],[94.28,95.66,96.39,97.12,97.32],[100.06,100.16,100.26,100.46,100.66],[102.68,103.02,103.54,104.07,104.6],[106.36,106.72,106.92,107.12,107.32],[111.26,111.36,111.46,111.66,111.86],[114.84,114.94,115.04,115.06,115.66],[117.12,117.38,118.42,118.66,119.26],[120.6,120.82,121.9,122.16,122.74],[123.26,124.58,124.91,125.24,125.44,125.64,125.84],[128.6,128.78,129.1,129.56,129.76,129.96,130.16],[133.5,133.6,133.7,134.74,134.96,135.54],[136.84,137.1,137.42,137.72,138.82,139.04,139.58],[141.1,141.32,141.62,142.12,143.22,143.52,144.02],[145.5,145.76,146.13,146.5,146.7,146.9,147.1]]; // 每句逐字起音時間（whisper small 對齊，嚴格遞增；weak 句內插）
 const AUD="audio.mp3",AU=new Audio(AUD);AU.preservesPitch=true;
 let audioStarted=false; // 一撳過播放就唔再換 AU.src，否則 load() 會 reset 播緊嘅音
+let segEnd=0; // 段落尾秒數；timeupdate 守住，唔好播過尾帶埋下一句（setTimeout 喺手機可以遲到）
+AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();});
 // 錄音已獨立成 audio.mp3；開頁即刻轉 blob URL，iOS 播放更穩（失敗就照用原檔；播緊就唔換，免 reset）
 fetch(AUD).then(r=>r.blob()).then(b=>{if(audioStarted)return;const u=URL.createObjectURL(b);AU.src=u;AU.load();}).catch(()=>{});
 function fIdx(){let f=0;for(let i=0;i<cur.s;i++)f+=S[i].lines.length;return f+cur.l;}
-function playSeg(a,done){const t=++tok;AU.pause();clearTimeout(timer);
+function playSeg(a,done){const t=++tok;segEnd=a[1];AU.pause();clearTimeout(timer);
  const r=slow?0.5:1;
  // 段落計時要由真正開始播嗰刻先計，唔係由撳掣嗰刻計，否則載入慢咗就會行快過把聲
- const startTimer=()=>{timer=setTimeout(()=>{AU.pause();if(t===tok&&done)done();},(a[1]-a[0])*1000/r);};
+ const startTimer=()=>{timer=setTimeout(()=>{AU.pause();segEnd=0;if(t===tok&&done)done();},(a[1]-a[0])*1000/r);};
  const go=()=>{audioStarted=true;try{AU.currentTime=a[0];}catch(e){}AU.playbackRate=r;const p=AU.play();if(p&&p.catch)p.catch(()=>{});startTimer();};
  // iOS 要求 play() 喺手勢內同步呼叫：未載入完都先 play，載入後再跳去正確位置
  if(AU.readyState>=1)go();
@@ -231,7 +233,7 @@ $("stop").onclick=stop;
 $("again").onclick=()=>{stop();playLine();};
 $("slow").onclick=e=>{slow=!slow;AU.playbackRate=slow?0.5:1;e.currentTarget.classList.toggle("on",slow);};
 $("tch").onclick=e=>{explain.classList.toggle("show");e.currentTarget.classList.toggle("on",explain.classList.contains("show"));};
-function stop(){playing=false;tok++;AU.pause();synth.cancel();clearTimeout(timer);clearTimeout(timer2);clearInterval(kar);kar=null;hint.textContent="";}
+function stop(){playing=false;tok++;segEnd=0;AU.pause();synth.cancel();clearTimeout(timer);clearTimeout(timer2);clearInterval(kar);kar=null;hint.textContent="";}
 // ── 家長手冊 ──
 $("manual").innerHTML="<tr><th>詩句</th><th>意思</th><th>同小朋友講</th></tr>"+
  S.filter(s=>s.lines.length).map(s=>"<tr><td>"+s.lines.join("<br>")+"</td><td>"+s.y+"</td><td>"+s.k+"</td></tr>").join("");
