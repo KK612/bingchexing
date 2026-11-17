@@ -90,6 +90,7 @@ footer{font-size:.75rem;color:#a29482;padding:10px}
   <div id="stage"></div>
   <div id="lines"></div>
   <div id="hint"></div>
+  <div id="dbg" style="display:none;font-family:monospace;font-size:11px;background:#111;color:#0f0;padding:8px;margin-top:8px;white-space:pre-wrap;word-break:break-all;text-align:left"></div>
   <div id="controls">
     <button id="play">▶ 由頭聽到尾</button>
     <button id="stop">⏹ 停</button>
@@ -168,6 +169,16 @@ let segEnd=0; // 段落尾秒數；timeupdate 守住，唔好播過尾帶埋下�
 AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();});
 // 錄音已獨立成 audio.mp3；開頁即刻轉 blob URL，iOS 播放更穩（失敗就照用原檔；播緊就唔換，免 reset）
 fetch(AUD).then(r=>r.blob()).then(b=>{if(audioStarted)return;const u=URL.createObjectURL(b);AU.src=u;AU.load();}).catch(()=>{});
+// ── debug 面板（?debug=1 先顯示；畀用戶截圖，睇吓部機上面實際發生緊咩）──
+const DBG=new URLSearchParams(location.search).has("debug"),dbgEl=document.getElementById("dbg");
+function dbgUpdate(){
+ if(!DBG||!dbgEl)return;
+ const arr=KT[14];
+ dbgEl.textContent="VER=raf1-dbg | KT[14]="+JSON.stringify(arr)+" | TL[15]="+JSON.stringify(TL[15])+"\n"
+  +"AU.src="+(AU.src.startsWith("blob:")?"blob":"direct")+" | readyState="+AU.readyState+" | duration="+(isFinite(AU.duration)?AU.duration.toFixed(2):AU.duration)+"\n"
+  +"t="+AU.currentTime.toFixed(2)+" | segEnd="+segEnd+" | paused="+AU.paused+" | rate="+AU.playbackRate+" | scene="+cur.s+" line="+cur.l+" fIdx="+fIdx();
+}
+if(DBG&&dbgEl){dbgEl.style.display="block";dbgUpdate();setInterval(dbgUpdate,200);}
 function fIdx(){let f=0;for(let i=0;i<cur.s;i++)f+=S[i].lines.length;return f+cur.l;}
 function playSeg(a,done){const t=++tok;segEnd=a[1];AU.pause();clearTimeout(timer);
  const r=slow?0.5:1;
@@ -207,6 +218,7 @@ function playLine(){
    const el=linesEl.querySelector(".line.on");
    if(el)hi(el,idx);
   }
+  dbgUpdate();
   kar=requestAnimationFrame(loop);
  };
  kar=requestAnimationFrame(loop);
