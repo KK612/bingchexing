@@ -401,11 +401,11 @@ window.__upgrade3D=async()=>{
   const tag40=tag("40歲");tag40.position.set(9,3.6,-6);sc.add(tag40);
   const arrow=spr("➡️",1.3);arrow.position.set(0,1.9,0);sc.add(arrow);
   update=(dt,t)=>{
-   const x=((t*2.0)%16)-8; // 8 秒行晒成條路，啱啱一幕嘅長度
+   const x=Math.min(t*2.7,16)-8; // 約 6 秒行晒成條路，行到田邊就停低，唔再循環返轉頭
    sol.position.set(x,0.66+Math.abs(Math.sin(t*5))*0.09,0);
    const grown=Math.min(1,Math.max(0,(x+8)/16)); // 由細變大
    const s=1+grown*0.3;sol.scale.set(s,s,1);
-   const isMan=x>0;boy.visible=!isMan;man.visible=isMan; // 行過中間就大個，變埋種田嘅
+   const isMan=x>-2;boy.visible=!isMan;man.visible=isMan; // 行過中段就大個，變埋種田嘅
    waves.forEach(w=>{w.position.x+=dt*0.7;if(w.position.x>20)w.position.x=-20;});
    crops.forEach((c,i)=>{c.rotation.z=Math.sin(t*2+i*0.7)*0.06;}); // 禾輕輕搖
    arrow.position.y=1.9+Math.sin(t*2.5)*0.15;
