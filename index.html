@@ -413,12 +413,16 @@ window.__upgrade3D=async()=>{
   const tag40=tag("40歲");tag40.position.set(-9,3.6,-6);sc.add(tag40);
   const arrowN=spr("⬆️",1.3);arrowN.position.set(7,1.9,-2);sc.add(arrowN);
   const arrowW=spr("⬅️",1.3);arrowW.position.set(-0.5,1.9,-6);arrowW.visible=false;sc.add(arrowW);
+  let etBase=null,tBase=0; // 音訊停低嗰陣記住行到邊，等佢由嗰度繼續行，唔好跳去終點
   update=(dt,t)=>{
    // 兩句分兩段行：第一句「北防河」（約 4.23 秒）向北；轉第二句「西營田」（約 4.76 秒）斜行向西
    const T1=4.23,T2=4.76; // TL[10]=[39.2,43.43]、TL[11]=[43.66,48.19]，成幕約 9 秒
-   // 跟音訊時鐘：播緊第 5 幕嗰陣，行路跟把聲行（慢速／重讀都同步）；冇播緊就用返場景時鐘
+   // 跟音訊時鐘：播緊第 5 幕嗰陣，行路跟把聲行（慢速／重讀都同步）；停咗就由停低嗰個位繼續自己行，唔會跳
    let et=t;
-   try{if(typeof AU!=="undefined"&&!AU.paused&&AU.currentTime>=39.2&&AU.currentTime<=48.19)et=AU.currentTime-39.2;}catch(e){}
+   try{
+    if(typeof AU!=="undefined"&&!AU.paused&&AU.currentTime>=39.2&&AU.currentTime<=48.19){et=AU.currentTime-39.2;etBase=et;tBase=t;}
+    else if(etBase!==null){et=Math.min(T1+T2,etBase+(t-tBase));}
+   }catch(e){}
    const DL=Math.hypot(Ex-Mx,Ez-Mz);
    let x,z,dx,dz,ph;
    if(et<T1){const p=et/T1;x=Sx+(Mx-Sx)*p;z=Sz+(Mz-Sz)*p;dx=0;dz=-1;ph=0;}
