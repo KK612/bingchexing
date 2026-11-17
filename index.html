@@ -208,7 +208,8 @@ function playLine(){
  linesEl.querySelectorAll(".line").forEach((el,i)=>el.classList.toggle("on",i===cur.l));
  const a=TL[fIdx()+1];
  cancelAnimationFrame(kar);
- playSeg(a,()=>{cancelAnimationFrame(kar);kar=null;if(playing)next();});
+ // 播成句嗰陣，提早 0.5 秒開聲（播句前嗰段靜音）：等瀏覽器 seek＋出聲嗰陣延遲食咗，唔好食埋第一隻字「武」嘅頭半截；highlight 照用 KT＋currentTime 對位，唔受影響；段尾（segEnd／timer）照樣喺 a[1] 停
+ playSeg([Math.max(0,a[0]-0.5),a[1]],()=>{cancelAnimationFrame(kar);kar=null;if(playing)next();});
  // 逐字紅色跟讀＋段落尾守衛：用 rAF 每幀對位（約 16ms），比 setInterval（80ms）更準，唔怕瀏覽器 throttle timer；timeupdate 嗰重守衛照留低做後備
  const loop=()=>{
   if(segEnd&&!AU.paused&&AU.currentTime>=segEnd)AU.pause();
