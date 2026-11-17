@@ -167,7 +167,7 @@ const AUD="audio.mp3",AU=new Audio(AUD);AU.preservesPitch=true;
 let audioStarted=false; // 一撳過播放就唔再換 AU.src，否則 load() 會 reset 播緊嘅音
 let segEnd=0; // 段落尾秒數；timeupdate 守住，唔好播過尾帶埋下一句（setTimeout 喺手機可以遲到）
 let segWall0=0,segPos0=0,segRate=1; // wall-clock 錨點：手機 currentTime 會滯後（實測慢 1–2 秒），改用 performance.now() 計播放位置，唔靠 currentTime
-function nowPos(){return segPos0+(performance.now()-segWall0)/1000*segRate;}
+function nowPos(){const p=segPos0+(performance.now()-segWall0)/1000*segRate;return segEnd?Math.min(p,segEnd):p;}
 AU.addEventListener("timeupdate",()=>{if(segEnd&&!AU.paused&&(AU.currentTime>=segEnd||nowPos()>=segEnd))AU.pause();if(kar)karTick();});
 let karWatch=null; // 250ms watchdog：rAF／timeupdate 喺手機被 throttle 嗰陣頂上，唔好等 highlight 慢幾秒、音頻播過尾
 // 逐字 highlight＋段尾守衛（共用）：rAF 順暢時每幀跑；rAF／timer 喺手機被 throttle 嗰陣，timeupdate（約 4 次／秒）＋ watchdog 頂上
