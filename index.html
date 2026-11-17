@@ -4,9 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>兵車行 · 廣東話背詩小教室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:"Kaiti TC","DFKai-SB","AR PL UKai CN","Noto Serif CJK TC",serif;background:#fdf6e3;color:#3b2f2f;text-align:center}
+body{margin:0;font-family:"LXGW WenKai TC","Kaiti TC","DFKai-SB","AR PL UKai CN","Noto Serif CJK TC",serif;background:#fdf6e3;color:#3b2f2f;text-align:center}
 header{padding:14px 8px 4px}
 header h1{margin:0;font-size:1.7rem;letter-spacing:.2em}
 header p{margin:2px 0 0;font-size:.95rem;color:#8a7a6a}
@@ -52,6 +55,30 @@ table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px}
 th,td{border:1px solid #e6d3b3;padding:8px;vertical-align:top;font-size:.95rem}
 th{background:#f6e7c8}
 footer{font-size:.75rem;color:#a29482;padding:10px}
+
+/* ── 跨裝置閱讀優化 ── */
+@media (max-width:560px){
+ header h1{font-size:1.45rem}
+ #stage{height:230px}
+ #stage span{font-size:2.1rem}
+ .line{font-size:1.45rem;letter-spacing:.08em}
+ #dots button{min-width:44px;height:44px;font-size:1rem}
+ #controls button{font-size:1rem;padding:12px 18px}
+ #explain{font-size:.95rem}
+ #manual,#manual tbody,#manual tr,#manual td{display:block;width:100%}
+ #manual tr:first-child{display:none}
+ #manual tr{margin-bottom:12px;border:1px solid #e6d3b3;border-radius:10px;overflow:hidden;background:#fff}
+ #manual td{border:none;border-bottom:1px solid #f0e2c8}
+ #manual td:last-child{border-bottom:none}
+ #manual td::before{display:block;font-weight:bold;color:#b45309;font-size:.8rem;margin-bottom:2px}
+ #manual td:nth-child(1)::before{content:"詩句"}
+ #manual td:nth-child(2)::before{content:"意思"}
+ #manual td:nth-child(3)::before{content:"同小朋友講"}
+}
+@media (max-width:380px){
+ .line{font-size:1.3rem}
+ #stage{height:210px}
+}
 </style>
 </head>
 <body>
@@ -223,6 +250,9 @@ window.__upgrade3D=async()=>{
  st.appendChild(r.domElement);
  [...st.children].forEach(el=>{if(el!==r.domElement)el.style.display="none";}); // 收起 2D 後備內容
  const sc=new T.Scene(),cam=new T.PerspectiveCamera(45,W/H,0.1,120);
+ const onResize=()=>{const w=st.clientWidth,h=st.clientHeight;if(!w||!h)return;cam.aspect=w/h;cam.updateProjectionMatrix();r.setSize(w,h);};
+ const onOrient=()=>setTimeout(onResize,350);
+ addEventListener("resize",onResize);addEventListener("orientationchange",onOrient);
  sc.add(new T.HemisphereLight(0xbfdfff,0x6b8f3a,1.15));
  const sun=new T.DirectionalLight(0xfff2cc,1.6);sun.position.set(6,10,4);sun.castShadow=true;
  Object.assign(sun.shadow.camera,{left:-12,right:12,top:12,bottom:-2});sun.shadow.camera.updateProjectionMatrix();sc.add(sun);
@@ -385,6 +415,7 @@ window.__upgrade3D=async()=>{
   cancelAnimationFrame(raf);window.__sc3d=null;
   dust.forEach(d=>{d.material.map.dispose();d.material.dispose();});
   sc.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.map&&m.map.dispose();m.dispose();});});
+  removeEventListener("resize",onResize);removeEventListener("orientationchange",onOrient);
   r.dispose();r.domElement.remove();
  };
 };
