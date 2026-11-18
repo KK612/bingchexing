@@ -122,7 +122,7 @@ const S=[
 {n:"好似雞狗",lines:["況復秦兵耐苦戰","被驅不異犬與雞"],h:'<span class="mv" style="top:48%;font-size:2.6rem;animation-duration:5s">🐔🐕</span><span class="wig" style="left:15%;top:40%;font-size:2.2rem">🧹</span>',y:"關中士兵耐苦善戰，卻像雞犬一般被驅來趕去。",k:"啲士兵幾叻都好，都係被人趕嚟趕去，好似趕雞趕狗咁，好唔開心。"},
 {n:"唔敢講",lines:["長者雖有問","役夫敢伸恨"],h:'<span class="bob" style="left:20%;top:42%">🧓</span><span class="up" style="left:28%;top:30%">❓</span><span class="bob" style="left:62%;top:42%;animation-delay:.5s">😢</span><span class="pop" style="left:72%;top:32%;animation-delay:.3s">🤐</span>',y:"長者您雖然問了，我們當兵的又豈敢申說怨恨？",k:"伯爺公問佢，佢都唔敢講出自己有幾慘，因為好驚，唯有收聲。"},
 {n:"冬天都要去",lines:["且如今年冬","未休關西卒"],h:'<span class="fall" style="left:25%;top:0">❄️</span><span class="fall" style="left:55%;top:0;animation-delay:1s">❄️</span><span class="fall" style="left:75%;top:0;animation-delay:1.8s">❄️</span><span class="bob" style="left:42%;top:45%;font-size:3rem">🥶</span>',y:"就如今年冬天，還不肯停止徵調關西的士卒。",k:"就連凍凍嘅冬天，都仲要叫啲士兵去打仗，唔俾佢哋返屋企休息。"},
-{n:"催租",lines:["縣官急索租","租稅從何出"],h:'<span class="bob" style="left:15%;top:40%;font-size:2.4rem">🏛️</span><span class="wig" style="left:45%;top:42%;font-size:2.4rem">📜</span><span class="pop" style="left:70%;top:48%">🍚</span><span class="up" style="left:78%;top:35%;animation-delay:.5s">❓</span>',y:"官府急着索取田租，租稅究竟從哪裡來？",k:"官府仲嚟催交租，男人唔喺度種田，邊有錢交呀？真係攞唔出。"},
+{n:"催租",lines:["縣官急索租","租稅從何出"],h:'<span class="bob" style="left:15%;top:40%;font-size:2.4rem">🏛️</span><span class="wig" style="left:45%;top:42%;font-size:2.4rem">📜</span><span class="pop" style="left:70%;top:48%">💲</span><span class="up" style="left:78%;top:35%;animation-delay:.5s">❓</span>',y:"官府急着索取田租，租稅究竟從哪裡來？",k:"官府仲嚟催交租，男人唔喺度種田，邊有錢交呀？真係攞唔出。"},
 {n:"生女好？",lines:["信知生男惡","反是生女好","生女猶得嫁比鄰","生男埋沒隨百草"],h:'<span class="pop" style="left:22%;top:45%;font-size:3rem">👧</span><span class="t" style="display:block;position:absolute;left:20%;top:75%">嫁隔籬</span><span class="bob" style="left:47%;top:45%;font-size:2rem">🆚</span><span class="grow" style="left:70%;top:48%;font-size:3rem">🥀</span><span class="t" style="display:block;position:absolute;left:66%;top:75%">回唔到屋</span>',y:"這才知道生兒子是遭殃，反是生女兒好：女兒還能嫁給近鄰有依靠，兒子卻埋屍荒野，與草木同腐。",k:"以前啲人錫仔多過錫女，而家掉轉咗：生女好啲，因為生仔要去打仗，好危險，返唔到屋企。"},
 {n:"青海白骨",lines:["君不見青海頭","古來白骨無人收"],h:'<span class="bob" style="left:15%;top:25%;font-size:2.2rem">🏞️</span><span style="left:45%;top:55%;position:absolute">🦴</span><span style="left:60%;top:62%;position:absolute">🦴</span><span style="left:75%;top:55%;position:absolute">🦴</span><span class="up" style="left:50%;top:35%;animation-delay:.6s">😢</span>',y:"您沒看見青海邊嗎？自古白骨無人收葬。",k:"睇下青海嗰邊，好多人打仗冇咗，一直冇人理，好可憐。"},
 {n:"鬼哭",lines:["新鬼煩冤舊鬼哭","天陰雨濕聲啾啾"],h:'<span class="fall" style="left:20%;top:0">💧</span><span class="fall" style="left:50%;top:0;animation-delay:1s">💧</span><span class="fall" style="left:80%;top:0;animation-delay:.5s">💧</span><span class="up" style="left:40%;top:60%;animation-duration:5s">👻</span><span class="up" style="left:65%;top:65%;animation-delay:2s;animation-duration:5s">👻</span>',y:"新死的鬼魂煩躁哀怨，舊鬼也哭泣，陰天雨天裡哭聲啾啾不絕。",k:"落雨嗰陣，好似聽到好多人喊咁，因為佢哋永遠返唔到屋企。所以打仗真係好慘，我哋要錫屋企人。"},
@@ -636,7 +636,10 @@ window.__upgrade3D=async()=>{
  }else if(si===10){
   // 好似雞狗：秦兵耐苦戰，卻被驅趕如雞犬——雞狗跑，士兵跟住跑
   const animals=[];[["🐔",0],["🐔",1.1],["🐕",2.2],["🐕",3.3]].forEach(([c,off])=>{
-   const s=spr(c,1.0);sc.add(s);animals.push({s,off});});
+   const g=new T.Group(); // 雞狗戴頭盔
+   const s=spr(c,1.0);g.add(s);
+   const helm=spr("🪖",0.55);helm.position.set(0,0.55,0.1);g.add(helm);
+   sc.add(g);animals.push({g,off});});
   const sol=spr("🪖",1.15);sc.add(sol);
   const broom=spr("🧹",1.0);sc.add(broom);
   function tag(txt){const cv=document.createElement("canvas");cv.width=256;cv.height=80;
@@ -647,7 +650,7 @@ window.__upgrade3D=async()=>{
   const tagDog=tag("犬與雞");tagDog.position.set(0,3.6,-4);sc.add(tagDog);
   update=(dt,t)=>{
    const x=((t*2.2)%26)-13; // 雞狗由左跑去右，循環
-   animals.forEach((a,i)=>{a.s.position.set(x-a.off*1.2,0.55+Math.abs(Math.sin(t*6+i))*0.12,[-0.5,0.5,-0.2,0.6][i]);});
+   animals.forEach((a,i)=>{a.g.position.set(x-a.off*1.2,0.55+Math.abs(Math.sin(t*6+i))*0.12,[-0.5,0.5,-0.2,0.6][i]);});
    sol.position.set(x-5.2,0.66+Math.abs(Math.sin(t*5))*0.09,0.2);
    broom.position.set(x-6.2,1.1+Math.sin(t*4)*0.1,0.3);
    broom.rotation.z=Math.sin(t*4)*0.2;
@@ -697,7 +700,10 @@ window.__upgrade3D=async()=>{
   br1.position.set(-6.5,2.2,-3);br1.rotation.z=0.7;sc.add(br1);
   const br2=new T.Mesh(new T.CylinderGeometry(0.05,0.08,1.0,6),new T.MeshLambertMaterial({color:0x5a3a1e}));
   br2.position.set(-5.5,2.0,-3);br2.rotation.z=-0.6;sc.add(br2);
-  const cold=spr("🥶",1.3);cold.position.set(0,0.66,0);sc.add(cold);
+  const cold=new T.Group(); // 冷到震嘅士兵戴頭盔
+  cold.add(spr("🥶",1.3));
+  const coldHelm=spr("🪖",0.65);coldHelm.position.set(0,0.65,0.1);cold.add(coldHelm);
+  cold.position.set(0,0.66,0);sc.add(cold);
   const flakes=[];for(let i=0;i<20;i++){const f=spr("❄️",0.55+Math.random()*0.35);
    f.position.set(-10+Math.random()*20,Math.random()*6,-5+Math.random()*8);
    f.userData.vy=-(1.2+Math.random()*0.8);sc.add(f);flakes.push(f);}
@@ -722,7 +728,7 @@ window.__upgrade3D=async()=>{
   // 催租：縣官急索租，租稅從何出——官府催交租，農民攞唔出
   const office=spr("🏛️",2.4);office.position.set(-7,1.2,-4);sc.add(office);
   const scroll=spr("📜",1.1);scroll.position.set(0,1.6,-2);sc.add(scroll);
-  const rice=spr("🍚",1.1);rice.position.set(4.5,0.8,0);sc.add(rice);
+  const money=spr("💲",1.1);money.position.set(4.5,0.8,0);sc.add(money);
   const officer=spr("👨‍💼",1.15);officer.position.set(-3,0.66,0);sc.add(officer);
   const farmer=spr("🧑‍🌾",1.15);farmer.position.set(3,0.66,0);sc.add(farmer);
   function tag(txt){const cv=document.createElement("canvas");cv.width=256;cv.height=80;
@@ -738,7 +744,7 @@ window.__upgrade3D=async()=>{
    farmer.rotation.z=Math.sin(t*2.5)*0.07; // 農民搖頭，攞唔出
    farmer.position.y=0.66+Math.sin(t*2)*0.02;
    scroll.position.y=1.6+Math.sin(t*2)*0.15;scroll.rotation.z=Math.sin(t*1.5)*0.08;
-   rice.position.y=0.8+Math.sin(t*1.8)*0.06;
+   money.position.y=0.8+Math.sin(t*1.8)*0.06;
    tagRent.position.y=3.6+Math.sin(t*1.5)*0.08;
    tick+=dt;
    if(tick>1.6){tick=0; // ❓由農民升起：邊有錢交？
