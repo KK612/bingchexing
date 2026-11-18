@@ -756,29 +756,33 @@ window.__upgrade3D=async()=>{
   };
  }else if(si===14){
   // 生女好？：生男惡，反是生女好——左邊生女嫁隔籬有依靠，右邊生男埋沒回唔到屋
-  const girl=spr("👧",1.2);girl.position.set(-6,0.66,0);sc.add(girl);
-  const home=spr("🏠",2.0);home.position.set(-8.5,1.1,-4);sc.add(home);
-  const flowers=[];[[-5,-2],[-7,-1]].forEach(([x,z])=>{const f=spr("🌸",0.9);
+  const girl=spr("👧",1.2);girl.position.set(-4.5,0.66,0);sc.add(girl);
+  const home=spr("🏠",2.0);home.position.set(-6.5,1.1,-4);sc.add(home);
+  const flowers=[];[[-3.5,-2],[-5.5,-1]].forEach(([x,z])=>{const f=spr("🌸",0.9);
    f.position.set(x,0.5,z);sc.add(f);flowers.push(f);});
-  const withered=spr("🥀",1.2);withered.position.set(6,0.66,0);sc.add(withered);
+  const boy=spr("👦",1.2);boy.position.set(4.5,0.66,0);sc.add(boy); // 右邊加返個男仔，同左邊女仔對稱
+  const withered=spr("🥀",1.2);withered.position.set(6,0.55,-1);sc.add(withered);
   const mound=new T.Mesh(new T.SphereGeometry(1.1,16,12),new T.MeshLambertMaterial({color:0x8a7a5a}));
-  mound.scale.y=0.35;mound.position.set(7.5,0,-2);sc.add(mound);
+  mound.scale.y=0.35;mound.position.set(6,0,-2.5);sc.add(mound);
   const versus=spr("🆚",1.4);versus.position.set(0,2.2,-1);sc.add(versus);
   function tag(txt){const cv=document.createElement("canvas");cv.width=256;cv.height=80;
    const g=cv.getContext("2d");g.font="bold 46px sans-serif";g.textAlign="center";g.textBaseline="middle";
    g.lineWidth=8;g.strokeStyle="rgba(60,40,10,0.9)";g.strokeText(txt,128,42);g.fillStyle="#fff";g.fillText(txt,128,42);
    const sp=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(cv),transparent:true}));
    sp.scale.set(2.8,0.9,1);return sp;}
-  const tagGirl=tag("生女好");tagGirl.position.set(-6,3.4,-3);sc.add(tagGirl);
-  const tagBoy=tag("生男惡");tagBoy.position.set(6,3.4,-3);sc.add(tagBoy);
+  const tagGirl=tag("生女好");tagGirl.position.set(-4.5,3.4,-3);sc.add(tagGirl);
+  const tagBoy=tag("生男惡");tagBoy.position.set(4.5,3.4,-3);sc.add(tagBoy);
   update=(dt,t)=>{
    girl.position.y=0.66+Math.abs(Math.sin(t*2.5))*0.06; // 女仔輕輕跳
+   boy.position.y=0.66+Math.abs(Math.sin(t*2.5+1))*0.06; // 男仔輕輕跳（同女仔對稱）
    flowers.forEach((f,i)=>{f.rotation.z=Math.sin(t*1.6+i)*0.1;f.position.y=0.5+Math.sin(t*1.8+i)*0.05;});
    withered.rotation.z=0.25+Math.sin(t*1.2)*0.08; // 枯花垂低
-   withered.position.y=0.66+Math.sin(t*1.2)*0.03;
+   withered.position.y=0.55+Math.sin(t*1.2)*0.03;
    versus.position.y=2.2+Math.sin(t*2)*0.15;versus.rotation.z=Math.sin(t*1.5)*0.06;
    tagGirl.position.y=3.4+Math.sin(t*1.5)*0.08;tagBoy.position.y=3.4+Math.sin(t*1.5+1)*0.08;
-   cam.position.set(Math.sin(t*0.25)*0.4,2.1,8.6);
+   // 窄屏（電話直向）要拉遠鏡頭先睇得晒左右，唔好切走兩邊；闊屏維持原距離（同第 7 幕做法）
+   const asp=cam.aspect||1.7,cz=Math.max(8.6,7/(0.4142*asp));
+   cam.position.set(Math.sin(t*0.25)*0.4,2.1,cz);
    cam.lookAt(0,1.2,0);
   };
  }else if(si===15){
